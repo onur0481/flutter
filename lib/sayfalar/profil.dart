@@ -21,6 +21,7 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
   int _takipci = 0;
   int _takipEdilen = 0;
   String gonderiStili = "liste";
+  Kullanici _profilSahibi;
   List<Gonderi> _gonderiler = [];
   TabController takipkontrol;
 
@@ -91,49 +92,46 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
             if (!snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
             }
-
-            return ListView(
-              shrinkWrap: true,
-              children: [
-                _profilDetaylari(snapshot.data),
-                _menu(snapshot.data),
-              ],
+            _profilSahibi = snapshot.data;
+            return NestedScrollView(
+              headerSliverBuilder:
+                  (BuildContext context, bool innerBoxScrolled) {
+                return <Widget>[
+                  SliverToBoxAdapter(
+                    child: _profilDetaylari(snapshot.data),
+                  ),
+                  SliverAppBar(
+                    backgroundColor: Colors.white,
+                    pinned: true,
+                    title: TabBar(controller: takipkontrol, tabs: [
+                      Tab(
+                        child: Center(
+                          child: Text(
+                            "Medya",
+                            style: TextStyle(fontSize: 17.0),
+                          ),
+                        ),
+                      ),
+                      Tab(
+                        child: Center(
+                          child: Text(
+                            "Yazı",
+                            style: TextStyle(fontSize: 17.0),
+                          ),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ];
+              },
+              body: TabBarView(controller: takipkontrol, children: [
+                _gonderileriGoster(snapshot.data),
+                Container(
+                  color: Colors.red,
+                ),
+              ]),
             );
           }),
-    );
-  }
-
-  Widget _menu(Kullanici data) {
-    return Column(
-      children: [
-        TabBar(controller: takipkontrol, tabs: [
-          Tab(
-            child: Center(
-              child: Text(
-                "Medya",
-                style: TextStyle(fontSize: 17.0),
-              ),
-            ),
-          ),
-          Tab(
-            child: Center(
-              child: Text(
-                "Yazı",
-                style: TextStyle(fontSize: 17.0),
-              ),
-            ),
-          ),
-        ]),
-        Container(
-          height: MediaQuery.of(context).size.height,
-          child: TabBarView(controller: takipkontrol, children: [
-            _gonderileriGoster(data),
-            Container(
-              color: Colors.red,
-            ),
-          ]),
-        ),
-      ],
     );
   }
 
