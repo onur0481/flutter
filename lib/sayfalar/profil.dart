@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:socialapp/modeller/gonderi.dart';
+import 'package:socialapp/modeller/yazi.dart';
+import 'package:socialapp/sayfalar/profilDuzenle.dart';
 import 'package:socialapp/servisler/firestoreservisi.dart';
 import 'package:socialapp/modeller/kullanici.dart';
 import 'package:socialapp/servisler/yetkilendirmeservisi.dart';
 import 'package:socialapp/widgetlar/gonderiKarti.dart';
+import 'package:socialapp/widgetlar/yaziKarti.dart';
 
 class Profil extends StatefulWidget {
   final String profilSahibiId;
@@ -18,12 +21,16 @@ class Profil extends StatefulWidget {
 
 class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
   int _gonderiSayisi = 0;
+  int _yaziSayisi = 0;
   int _takipci = 0;
   int _takipEdilen = 0;
   String gonderiStili = "liste";
+  String _aktifKullaniciId;
   Kullanici _profilSahibi;
   List<Gonderi> _gonderiler = [];
+  List<Yazi> _yazilar = [];
   TabController takipkontrol;
+  bool _takipEdildi = false;
 
   Future _takipciSayisiGetir() async {
     int takipciSayisi =
@@ -56,13 +63,43 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
     }
   }
 
+  _yazilariGetir() async {
+    List<Yazi> yazilar =
+        await FireStoreServisi().yaziGetir(widget.profilSahibiId);
+    if (mounted) {
+      setState(() {
+        _yazilar = yazilar;
+        _yaziSayisi = _yazilar.length;
+      });
+      if (yazilar.isEmpty) {
+        print("değer geldi");
+      }
+    }
+  }
+
+  _takipKontrol() async {
+    bool takipVarmi = await FireStoreServisi().takipKontrol(
+        aktifKullaniciId: _aktifKullaniciId,
+        profilSahibiId: widget.profilSahibiId);
+
+    setState(() {
+      _takipEdildi = takipVarmi;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _takipciSayisiGetir();
     _takipEdilenSayisiGetir();
     _gonderileriGetir();
+    _yazilariGetir();
+
     takipkontrol = TabController(length: 2, vsync: this);
+    _aktifKullaniciId =
+        Provider.of<YetkilendirmeServisi>(context, listen: false)
+            .aktifKullaniciId;
+    _takipKontrol();
   }
 
   @override
@@ -74,17 +111,22 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
           style: TextStyle(
               fontFamily: "NanumBrushScript",
               fontSize: 40.0,
-              color: Colors.black),
+              color: Colors.blue),
         ),
         backgroundColor: Colors.grey[100],
         actions: <Widget>[
-          IconButton(
-              icon: Icon(
-                Icons.exit_to_app,
-                color: Colors.black,
-              ),
-              onPressed: _cikisYap)
+          widget.profilSahibiId == _aktifKullaniciId
+              ? IconButton(
+                  icon: Icon(
+                    Icons.exit_to_app,
+                    color: Colors.blue,
+                  ),
+                  onPressed: _cikisYap)
+              : SizedBox(
+                  height: 0.0,
+                ),
         ],
+        iconTheme: IconThemeData(color: Colors.blue),
       ),
       body: FutureBuilder<Object>(
           future: FireStoreServisi().kullaniciGetir(widget.profilSahibiId),
@@ -126,9 +168,7 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
               },
               body: TabBarView(controller: takipkontrol, children: [
                 _gonderileriGoster(snapshot.data),
-                Container(
-                  color: Colors.red,
-                ),
+                _yazilariGoster(snapshot.data),
               ]),
             );
           }),
@@ -163,6 +203,19 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
             children: resimler),
       );
     }
+  }
+
+  Widget _yazilariGoster(Kullanici profilData) {
+    return Container(
+      child: ListView.builder(
+          itemCount: _yazilar.length,
+          itemBuilder: (context, index) {
+            return YaziKarti(
+              yazi: _yazilar[index],
+              yayinlayan: profilData,
+            );
+          }),
+    );
   }
 
   GridTile resimOlustur(Gonderi gonderi) {
@@ -239,18 +292,20 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
               ),
             ),
             Positioned(
-              left: 285.0,
+              left: 267.0,
               bottom: 50.0,
               child: Container(
-                width: 120.0,
-                height: 40.0,
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(15.0),
-                  border: Border.all(width: 2.0),
-                ),
-                child: _profiliDuzenle(),
-              ),
+                  alignment: Alignment.center,
+                  width: 140.0,
+                  height: 40.0,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(15.0),
+                    border: Border.all(width: 2.0),
+                  ),
+                  child: widget.profilSahibiId == _aktifKullaniciId
+                      ? _profiliDuzenle()
+                      : _takipButonu()),
             ),
           ],
         ),
@@ -262,8 +317,10 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
           color: Colors.grey.withOpacity(0.1),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              _sosyalSayac(baslik: "Gönderiler", sayi: _gonderiSayisi),
+              _sosyalSayac(baslik: "Medya", sayi: _gonderiSayisi),
+              _sosyalSayac(baslik: "Yazı", sayi: _yaziSayisi),
               _sosyalSayac(baslik: "Takipçi", sayi: _takipci),
               _sosyalSayac(baslik: "Takip", sayi: _takipEdilen),
             ],
@@ -276,10 +333,79 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
     );
   }
 
+  Widget _takipButonu() {
+    return _takipEdildi ? _takiptenCik() : _takipEt();
+  }
+
+  Widget _takipEt() {
+    return OutlineButton(
+      onPressed: () {
+        FireStoreServisi().takipEt(
+            aktifKullaniciId: _aktifKullaniciId,
+            profilSahibiId: widget.profilSahibiId);
+        setState(() {
+          _takipEdildi = true;
+          _takipci = _takipci + 1;
+        });
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.group_add_outlined),
+          SizedBox(
+            width: 2.0,
+          ),
+          Text(
+            " Takip Et",
+            style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _takiptenCik() {
+    return OutlineButton(
+      onPressed: () {
+        FireStoreServisi().takiptenCik(
+            aktifKullaniciId: _aktifKullaniciId,
+            profilSahibiId: widget.profilSahibiId);
+        setState(() {
+          _takipEdildi = false;
+          _takipci = _takipci - 1;
+        });
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.cancel),
+          SizedBox(
+            width: 2.0,
+          ),
+          Text(
+            "Takip Çık",
+            style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _profiliDuzenle() {
     return OutlineButton(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ProfilDuzenle(
+                      profil: _profilSahibi,
+                    )));
+      },
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.edit),
           SizedBox(

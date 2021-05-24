@@ -100,7 +100,7 @@ class _HesapOlusturState extends State<HesapOlustur> {
                     ),
                     validator: (girilenDeger) {
                       if (girilenDeger.isEmpty) {
-                        return "Şifre alanı bırakılamaz";
+                        return "Şifre alanı boş bırakılamaz";
                       } else if (girilenDeger.trim().length < 4) {
                         return "Şifre 4 karakterden az olmamalıdır!";
                       } else {

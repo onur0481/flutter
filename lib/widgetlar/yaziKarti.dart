@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:socialapp/modeller/gonderi.dart';
 import 'package:socialapp/modeller/kullanici.dart';
-import 'package:socialapp/sayfalar/profil.dart';
-import 'package:socialapp/sayfalar/yorumlar.dart';
+import 'package:socialapp/modeller/yazi.dart';
+import 'package:socialapp/sayfalar/yaziYorumlari.dart';
 import 'package:socialapp/servisler/firestoreservisi.dart';
 import 'package:socialapp/servisler/yetkilendirmeservisi.dart';
 
-class GonderiKarti extends StatefulWidget {
-  final Gonderi gonderi;
+class YaziKarti extends StatefulWidget {
+  final Yazi yazi;
   final Kullanici yayinlayan;
 
-  const GonderiKarti({Key key, this.gonderi, this.yayinlayan})
-      : super(key: key);
-
+  const YaziKarti({Key key, this.yazi, this.yayinlayan}) : super(key: key);
   @override
-  _GonderiKartiState createState() => _GonderiKartiState();
+  _YaziKartiState createState() => _YaziKartiState();
 }
 
-class _GonderiKartiState extends State<GonderiKarti> {
+class _YaziKartiState extends State<YaziKarti> {
   int _begeniSayisi = 0;
   bool _begendinmi = false;
   String _aktifKullanici;
@@ -26,15 +23,15 @@ class _GonderiKartiState extends State<GonderiKarti> {
   @override
   void initState() {
     super.initState();
-    _begeniSayisi = widget.gonderi.begeniSayisi;
+    _begeniSayisi = widget.yazi.begeniSayisi;
     _aktifKullanici = Provider.of<YetkilendirmeServisi>(context, listen: false)
         .aktifKullaniciId;
-    begeniVarmi();
+    begeniVarmii();
   }
 
-  begeniVarmi() async {
+  begeniVarmii() async {
     bool begendimi =
-        await FireStoreServisi().begeniVarmi(widget.gonderi, _aktifKullanici);
+        await FireStoreServisi().begeniVarmii(widget.yazi, _aktifKullanici);
     if (begendimi) {
       if (mounted) {
         setState(() {
@@ -44,17 +41,7 @@ class _GonderiKartiState extends State<GonderiKarti> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Column(
-        children: <Widget>[_gonderiBasligi(), _gonderiResmi(), _gonderiAlt()],
-      ),
-    );
-  }
-
-  gonderiSecenekleri() {
+  yaziSecenekleri() {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
@@ -123,10 +110,9 @@ class _GonderiKartiState extends State<GonderiKarti> {
                             ),
                           ),
                           onTap: () {
-                            FireStoreServisi().resimGonderiSil(
+                            FireStoreServisi().yazigonderiSil(
                                 aktifKullaniciId: _aktifKullanici,
-                                gonderi: widget.gonderi);
-                            Navigator.pop(context);
+                                yazi: widget.yazi);
                           },
                         ),
                         SizedBox(
@@ -245,7 +231,17 @@ class _GonderiKartiState extends State<GonderiKarti> {
         });
   }
 
-  Widget _gonderiBasligi() {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Column(
+        children: [_yaziBasligi(), _yazi(), _yaziAlt()],
+      ),
+    );
+  }
+
+  _yaziBasligi() {
     return ListTile(
       leading: Padding(
         padding: const EdgeInsets.only(left: 8.0),
@@ -260,36 +256,35 @@ class _GonderiKartiState extends State<GonderiKarti> {
         widget.yayinlayan.kullaniciAdi,
         style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
       ),
-      trailing: _aktifKullanici == widget.gonderi.yayinlayanId
-          ? IconButton(
-              icon: Icon(
-                Icons.more_vert,
-                color: Colors.blue,
-              ),
-              onPressed: () {
-                gonderiSecenekleri();
-              })
-          : null,
+      trailing: IconButton(
+          icon: Icon(
+            Icons.more_vert,
+            color: Colors.blue,
+          ),
+          onPressed: () {
+            yaziSecenekleri();
+          }),
       contentPadding: EdgeInsets.all(0.0),
     );
   }
 
-  Widget _gonderiResmi() {
+  _yazi() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onDoubleTap: _begeniDegistir,
-        child: Image.network(
-          widget.gonderi.gonderiResmiUrl,
-          width: MediaQuery.of(context).size.width,
-          height: 300.0,
-          fit: BoxFit.cover,
+      //onDoubleTap: _begeniDegistir,
+      child: Container(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          widget.yazi.yazi,
+          style: TextStyle(
+            fontSize: 17.0,
+          ),
         ),
       ),
     );
   }
 
-  Widget _gonderiAlt() {
+  _yaziAlt() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -297,18 +292,19 @@ class _GonderiKartiState extends State<GonderiKarti> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
-                icon: !_begendinmi
-                    ? Icon(
-                        Icons.favorite_border,
-                        color: Colors.blue,
-                        size: 25.0,
-                      )
-                    : Icon(
-                        Icons.favorite,
-                        size: 25.0,
-                        color: Colors.red,
-                      ),
-                onPressed: _begeniDegistir),
+              icon: !_begendinmi
+                  ? Icon(
+                      Icons.favorite_border,
+                      color: Colors.blue,
+                      size: 25.0,
+                    )
+                  : Icon(
+                      Icons.favorite,
+                      size: 25.0,
+                      color: Colors.red,
+                    ),
+              onPressed: _begeniDegistir,
+            ),
             IconButton(
                 icon: Icon(
                   Icons.comment_outlined,
@@ -320,7 +316,7 @@ class _GonderiKartiState extends State<GonderiKarti> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              Yorumlar(gonderi: widget.gonderi)));
+                              YaziYorumlari(yazi: widget.yazi)));
                 }),
             IconButton(
                 icon: Icon(
@@ -339,33 +335,19 @@ class _GonderiKartiState extends State<GonderiKarti> {
           ),
         ),
         SizedBox(
-          height: 2.0,
+          height: 15.0,
         ),
-        widget.gonderi.aciklama.isNotEmpty
-            ? Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: RichText(
-                  text: TextSpan(
-                    text: widget.yayinlayan.kullaniciAdi + " ",
-                    style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: widget.gonderi.aciklama,
-                        style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            : SizedBox(
-                height: 0.0,
-              ),
+        Padding(
+          padding: const EdgeInsets.only(left: 13.0, right: 13.0),
+          child: Container(
+            height: 1.0,
+            width: double.infinity,
+            color: Colors.grey,
+          ),
+        ),
+        SizedBox(
+          height: 20.0,
+        ),
       ],
     );
   }
@@ -378,7 +360,7 @@ class _GonderiKartiState extends State<GonderiKarti> {
           _begeniSayisi = _begeniSayisi - 1;
         });
       }
-      FireStoreServisi().gonderiBegeniKaldir(widget.gonderi, _aktifKullanici);
+      FireStoreServisi().yaziBegeniKaldir(widget.yazi, _aktifKullanici);
     } else {
       if (mounted) {
         setState(() {
@@ -386,7 +368,7 @@ class _GonderiKartiState extends State<GonderiKarti> {
           _begeniSayisi = _begeniSayisi + 1;
         });
       }
-      FireStoreServisi().gonderiBegen(widget.gonderi, _aktifKullanici);
+      FireStoreServisi().yaziBegen(widget.yazi, _aktifKullanici);
     }
   }
 }

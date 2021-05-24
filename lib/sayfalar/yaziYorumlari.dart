@@ -1,44 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:socialapp/modeller/gonderi.dart';
 import 'package:socialapp/modeller/kullanici.dart';
+import 'package:socialapp/modeller/yazi.dart';
 import 'package:socialapp/modeller/yorum.dart';
 import 'package:socialapp/servisler/firestoreservisi.dart';
 import 'package:socialapp/servisler/yetkilendirmeservisi.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
-class Yorumlar extends StatefulWidget {
-  final Gonderi gonderi;
+class YaziYorumlari extends StatefulWidget {
+  final Yazi yazi;
 
-  const Yorumlar({Key key, this.gonderi}) : super(key: key);
+  const YaziYorumlari({Key key, this.yazi}) : super(key: key);
 
   @override
-  _YorumlarState createState() => _YorumlarState();
+  _YaziYorumlariState createState() => _YaziYorumlariState();
 }
 
-class _YorumlarState extends State<Yorumlar> {
+class _YaziYorumlariState extends State<YaziYorumlari> {
   TextEditingController _yorumKontrol = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    timeago.setLocaleMessages('tr', timeago.TrMessages());
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-            icon: Icon(
-              Icons.cancel_rounded,
-              size: 35.0,
-              color: Colors.blue,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
         backgroundColor: Colors.white,
         title: Text(
           "Yorumlar",
@@ -47,6 +30,7 @@ class _YorumlarState extends State<Yorumlar> {
               fontSize: 40.0,
               color: Colors.blue),
         ),
+        iconTheme: IconThemeData(color: Colors.blue),
       ),
       body: Column(
         children: <Widget>[_yorumlariGoster(), _yorumyap()],
@@ -57,7 +41,7 @@ class _YorumlarState extends State<Yorumlar> {
   _yorumlariGoster() {
     return Expanded(
       child: StreamBuilder<QuerySnapshot>(
-          stream: FireStoreServisi().yorumlariGetir(widget.gonderi.id),
+          stream: FireStoreServisi().yorumlariGetirr(widget.yazi.id),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
@@ -109,8 +93,6 @@ class _YorumlarState extends State<Yorumlar> {
                 ],
               ),
             ),
-            subtitle: Text(
-                timeago.format(yorum.olusturulmaZamani.toDate(), locale: "tr")),
           );
         });
   }
@@ -125,18 +107,18 @@ class _YorumlarState extends State<Yorumlar> {
       ),
       trailing: IconButton(
         icon: Icon(Icons.send),
-        onPressed: _yorumGonder,
+        onPressed: _yorumGonderr,
       ),
     );
   }
 
-  void _yorumGonder() {
+  void _yorumGonderr() {
     String aktifKullanici =
         Provider.of<YetkilendirmeServisi>(context, listen: false)
             .aktifKullaniciId;
-    FireStoreServisi().yorumEkle(
+    FireStoreServisi().yorumEklee(
         aktifKullaniciId: aktifKullanici,
-        gonderi: widget.gonderi,
+        yazi: widget.yazi,
         icerik: _yorumKontrol.text);
     _yorumKontrol.clear();
   }

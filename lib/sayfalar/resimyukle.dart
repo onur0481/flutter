@@ -28,16 +28,16 @@ class _YukleState extends State<Yukle> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_sharp, color: Colors.black),
+            icon: Icon(Icons.cancel_rounded, size: 35.0, color: Colors.blue),
             onPressed: () {
               Navigator.pop(context);
             }),
         title: Text(
-          "Gonderi",
+          "Fotograf",
           style: TextStyle(
               fontFamily: "NanumBrushScript",
               fontSize: 40.0,
-              color: Colors.black),
+              color: Colors.blue),
         ),
       ),
       body: Center(
@@ -72,12 +72,13 @@ class _YukleState extends State<Yukle> {
         backgroundColor: Colors.grey[100],
         title: Text(
           "Gönderi Oluştur",
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.blue),
         ),
         leading: IconButton(
             icon: Icon(
-              Icons.arrow_back,
-              color: Colors.black,
+              Icons.cancel_rounded,
+              size: 35.0,
+              color: Colors.blue,
             ),
             onPressed: () {
               setState(() {
@@ -86,10 +87,8 @@ class _YukleState extends State<Yukle> {
             }),
         actions: [
           IconButton(
-              icon: Icon(
-                Icons.send,
-                color: Colors.black,
-              ),
+              icon: Icon(Icons.send_outlined),
+              color: Colors.blue,
               onPressed: _gonderiOlustur),
         ],
       ),
