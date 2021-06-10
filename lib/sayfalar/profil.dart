@@ -24,7 +24,8 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
   int _yaziSayisi = 0;
   int _takipci = 0;
   int _takipEdilen = 0;
-  String gonderiStili = "liste";
+  String gonderiStili = "grid";
+
   String _aktifKullaniciId;
   Kullanici _profilSahibi;
   List<Gonderi> _gonderiler = [];
@@ -71,9 +72,6 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
         _yazilar = yazilar;
         _yaziSayisi = _yazilar.length;
       });
-      if (yazilar.isEmpty) {
-        print("değer geldi");
-      }
     }
   }
 
@@ -84,6 +82,7 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
 
     setState(() {
       _takipEdildi = takipVarmi;
+      print("ede");
     });
   }
 
@@ -94,12 +93,11 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
     _takipEdilenSayisiGetir();
     _gonderileriGetir();
     _yazilariGetir();
-
+    _takipKontrol();
     takipkontrol = TabController(length: 2, vsync: this);
     _aktifKullaniciId =
         Provider.of<YetkilendirmeServisi>(context, listen: false)
             .aktifKullaniciId;
-    _takipKontrol();
   }
 
   @override
@@ -176,7 +174,7 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
   }
 
   Widget _gonderileriGoster(Kullanici profilData) {
-    if (gonderiStili == "liste") {
+    if (gonderiStili == "grid") {
       return Container(
         child: ListView.builder(
           itemCount: _gonderiler.length,
@@ -193,14 +191,17 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
       _gonderiler.forEach((gonderi) {
         resimler.add(resimOlustur(gonderi));
       });
-      return Container(
-        child: GridView.count(
-            crossAxisCount: 2,
-            childAspectRatio: 0.8,
-            shrinkWrap: true,
-            mainAxisSpacing: 10.0,
-            crossAxisSpacing: 10.0,
-            children: resimler),
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          child: GridView.count(
+              crossAxisCount: 2,
+              childAspectRatio: 0.8,
+              shrinkWrap: true,
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+              children: resimler),
+        ),
       );
     }
   }
@@ -233,11 +234,11 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
         Stack(
           children: <Widget>[
             Container(
-              height: 250.0,
-              // color: Colors.yellow,
+              height: 240.0,
+              //color: Colors.yellow,
             ),
             Container(
-              height: 150,
+              height: 180,
               decoration: BoxDecoration(
                 color: Colors.green,
                 image: DecorationImage(
@@ -249,8 +250,8 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
               ),
             ),
             Positioned(
-              left: 145.0,
-              bottom: 50.0,
+              right: MediaQuery.of(context).size.width / 2.8,
+              bottom: 0.0,
               child: Container(
                 height: 120.0,
                 width: 120.0,
@@ -265,54 +266,47 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
                   borderRadius: BorderRadius.circular(60.0),
                   border: Border.all(width: 2.0, color: Colors.white),
                 ),
+                child: SizedBox(
+                  height: 8.0,
+                ),
               ),
-            ),
-            Positioned(
-              left: 147.0,
-              bottom: 0.0,
-              child: Column(
-                children: [
-                  Text(
-                    profilData.kullaniciAdi,
-                    style: TextStyle(
-                      fontSize: 22.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    profilData.hakkinda,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              left: 267.0,
-              bottom: 50.0,
-              child: Container(
-                  alignment: Alignment.center,
-                  width: 140.0,
-                  height: 40.0,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(15.0),
-                    border: Border.all(width: 2.0),
-                  ),
-                  child: widget.profilSahibiId == _aktifKullaniciId
-                      ? _profiliDuzenle()
-                      : _takipButonu()),
             ),
           ],
         ),
         SizedBox(
+          height: 9.0,
+        ),
+        Column(
+          children: [
+            Text(
+              profilData.kullaniciAdi,
+              style: TextStyle(
+                fontSize: 22.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            Text(
+              profilData.hakkinda,
+              style: TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 15.0,
+        ),
+        widget.profilSahibiId == _aktifKullaniciId
+            ? _profiliDuzenle()
+            : _takipButonu(),
+        SizedBox(
           height: 20.0,
         ),
         Container(
+          alignment: Alignment.center,
           height: 75.0,
           color: Colors.grey.withOpacity(0.1),
           child: Row(
@@ -338,84 +332,96 @@ class _ProfilState extends State<Profil> with SingleTickerProviderStateMixin {
   }
 
   Widget _takipEt() {
-    return OutlineButton(
-      onPressed: () {
-        FireStoreServisi().takipEt(
-            aktifKullaniciId: _aktifKullaniciId,
-            profilSahibiId: widget.profilSahibiId);
-        setState(() {
-          _takipEdildi = true;
-          _takipci = _takipci + 1;
-        });
-      },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.group_add_outlined),
-          SizedBox(
-            width: 2.0,
-          ),
-          Text(
-            " Takip Et",
-            style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width / 1.5,
+        height: 45.0,
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        child: TextButton(
+            onPressed: () {
+              FireStoreServisi().takipEt(
+                  aktifKullaniciId: _aktifKullaniciId,
+                  profilSahibiId: widget.profilSahibiId);
+              setState(() {
+                _takipEdildi = true;
+                _takipci = _takipci + 1;
+              });
+            },
+            child: Text(
+              "Takip Et",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20.0,
+                letterSpacing: 2,
+              ),
+            )),
       ),
     );
   }
 
   Widget _takiptenCik() {
-    return OutlineButton(
-      onPressed: () {
-        FireStoreServisi().takiptenCik(
-            aktifKullaniciId: _aktifKullaniciId,
-            profilSahibiId: widget.profilSahibiId);
-        setState(() {
-          _takipEdildi = false;
-          _takipci = _takipci - 1;
-        });
-      },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.cancel),
-          SizedBox(
-            width: 2.0,
-          ),
-          Text(
-            "Takip Çık",
-            style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width / 1.5,
+        height: 45.0,
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        child: TextButton(
+            onPressed: () {
+              FireStoreServisi().takiptenCik(
+                  aktifKullaniciId: _aktifKullaniciId,
+                  profilSahibiId: widget.profilSahibiId);
+              setState(() {
+                _takipEdildi = false;
+                _takipci = _takipci - 1;
+              });
+            },
+            child: Text(
+              "Takipten Çık",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20.0,
+                letterSpacing: 2,
+              ),
+            )),
       ),
     );
   }
 
   Widget _profiliDuzenle() {
-    return OutlineButton(
-      onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ProfilDuzenle(
-                      profil: _profilSahibi,
-                    )));
-      },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.edit),
-          SizedBox(
-            width: 2.0,
-          ),
-          Text(
-            " Düzenle",
-            style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width / 1.5,
+        height: 45.0,
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        child: TextButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProfilDuzenle(
+                            profil: _profilSahibi,
+                          )));
+            },
+            child: Text(
+              "Profili Düzenle",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20.0,
+                letterSpacing: 2,
+              ),
+            )),
       ),
     );
   }

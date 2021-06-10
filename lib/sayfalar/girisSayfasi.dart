@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:socialapp/sayfalar/sifremiUnuttum.dart';
 import 'package:socialapp/servisler/firestoreservisi.dart';
 import 'package:socialapp/modeller/kullanici.dart';
 import 'package:socialapp/sayfalar/hesapolustur.dart';
@@ -21,10 +22,11 @@ class _GirisSayfasiState extends State<GirisSayfasi> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Center(
             child: Text(
           "Giriş",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.blue, fontSize: 25.0),
         )),
       ),
       key: _scaffoldAnahtari,
@@ -51,9 +53,11 @@ class _GirisSayfasiState extends State<GirisSayfasi> {
       child: ListView(
         padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 60.0),
         children: <Widget>[
-          FlutterLogo(
-            size: 90.0,
-          ),
+          Container(
+              width: 140.0,
+              height: 100.0,
+              child: Image.asset("assets/images/smartphone.png",
+                  fit: BoxFit.fitHeight)),
           SizedBox(
             height: 80.0,
           ),
@@ -103,37 +107,43 @@ class _GirisSayfasiState extends State<GirisSayfasi> {
           Row(
             children: <Widget>[
               Expanded(
-                child: FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => HesapOlustur()));
-                  },
-                  child: Text(
-                    "Hesap Oluştur",
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
+                child: Container(
+                  height: 40.0,
+                  color: Colors.blue,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => HesapOlustur()));
+                    },
+                    child: Text(
+                      "Hesap Oluştur",
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  color: Theme.of(context).primaryColor,
-                  textColor: Colors.white,
                 ),
               ),
               SizedBox(
                 width: 10.0,
               ),
               Expanded(
-                child: FlatButton(
-                  onPressed: _girisYap,
-                  child: Text(
-                    "Giriş Yap",
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                child: Container(
+                  height: 40.0,
+                  color: Colors.green,
+                  child: TextButton(
+                    onPressed: _girisYap,
+                    child: Text(
+                      "Giriş Yap",
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  color: Theme.of(context).primaryColorDark,
                 ),
               ),
             ],
@@ -144,20 +154,47 @@ class _GirisSayfasiState extends State<GirisSayfasi> {
           Center(
             child: Text(
               "veya",
+              style: TextStyle(fontSize: 18.0),
             ),
           ),
           SizedBox(
             height: 20.0,
           ),
           Center(
-            child: InkWell(
-              onTap: _googleIleGiris,
-              child: Text(
-                "Gmail ile giriş yap",
-                style: TextStyle(
-                    fontSize: 19.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[600]),
+            child: Container(
+              height: 53.0,
+              width: MediaQuery.of(context).size.width / 1.5,
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.asset(
+                          "assets/images/google.png",
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: _googleIleGiris,
+                      child: Text(
+                        "Google ile Giriş Yapın",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -165,8 +202,15 @@ class _GirisSayfasiState extends State<GirisSayfasi> {
             height: 20.0,
           ),
           Center(
-            child: Text(
-              "Şifremi unuttum",
+            child: InkWell(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SifremiUnuttum()));
+              },
+              child: Text(
+                "Şifremi unuttum",
+                style: TextStyle(fontSize: 18.0),
+              ),
             ),
           ),
           SizedBox(

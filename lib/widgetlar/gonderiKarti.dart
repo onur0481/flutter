@@ -249,16 +249,52 @@ class _GonderiKartiState extends State<GonderiKarti> {
     return ListTile(
       leading: Padding(
         padding: const EdgeInsets.only(left: 8.0),
-        child: CircleAvatar(
-          backgroundColor: Colors.blue,
-          backgroundImage: widget.yayinlayan.fotoUrl.isNotEmpty
-              ? NetworkImage(widget.yayinlayan.fotoUrl)
-              : AssetImage("assets/images/profil.png"),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Profil(
+                          profilSahibiId: widget.gonderi.yayinlayanId,
+                        )));
+          },
+          child: CircleAvatar(
+            backgroundColor: Colors.blue,
+            backgroundImage: widget.yayinlayan.fotoUrl.isNotEmpty
+                ? NetworkImage(widget.yayinlayan.fotoUrl)
+                : AssetImage("assets/images/profil.png"),
+          ),
         ),
       ),
-      title: Text(
-        widget.yayinlayan.kullaniciAdi,
-        style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
+      title: GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Profil(
+                        profilSahibiId: widget.gonderi.yayinlayanId,
+                      )));
+        },
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.yayinlayan.kullaniciAdi,
+                  style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: 3.0,
+                ),
+                Text(
+                  widget.gonderi.konum,
+                  style: TextStyle(fontSize: 14.0),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       trailing: _aktifKullanici == widget.gonderi.yayinlayanId
           ? IconButton(
@@ -293,43 +329,67 @@ class _GonderiKartiState extends State<GonderiKarti> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            IconButton(
-                icon: !_begendinmi
-                    ? Icon(
-                        Icons.favorite_border,
+        SizedBox(
+          height: 6.0,
+        ),
+        Container(
+          color: Colors.grey[200],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                      icon: !_begendinmi
+                          ? Icon(
+                              Icons.favorite_border,
+                              color: Colors.blue,
+                              size: 25.0,
+                            )
+                          : Icon(
+                              Icons.favorite,
+                              size: 25.0,
+                              color: Colors.red,
+                            ),
+                      onPressed: _begeniDegistir),
+                  Text("Beğen"),
+                ],
+              ),
+              Row(
+                children: [
+                  IconButton(
+                      icon: Icon(
+                        Icons.comment_outlined,
                         color: Colors.blue,
                         size: 25.0,
-                      )
-                    : Icon(
-                        Icons.favorite,
-                        size: 25.0,
-                        color: Colors.red,
                       ),
-                onPressed: _begeniDegistir),
-            IconButton(
-                icon: Icon(
-                  Icons.comment_outlined,
-                  color: Colors.blue,
-                  size: 25.0,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              Yorumlar(gonderi: widget.gonderi)));
-                }),
-            IconButton(
-                icon: Icon(
-                  Icons.near_me_rounded,
-                  color: Colors.blue,
-                  size: 25.0,
-                ),
-                onPressed: () {})
-          ],
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    Yorumlar(gonderi: widget.gonderi)));
+                      }),
+                  Text("Yorum yap"),
+                ],
+              ),
+              Row(
+                children: [
+                  IconButton(
+                      icon: Icon(
+                        Icons.near_me_rounded,
+                        color: Colors.blue,
+                        size: 25.0,
+                      ),
+                      onPressed: () {}),
+                  Text("Gönder"),
+                ],
+              )
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 9.0,
         ),
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
@@ -339,7 +399,7 @@ class _GonderiKartiState extends State<GonderiKarti> {
           ),
         ),
         SizedBox(
-          height: 2.0,
+          height: 5.0,
         ),
         widget.gonderi.aciklama.isNotEmpty
             ? Padding(
@@ -348,14 +408,14 @@ class _GonderiKartiState extends State<GonderiKarti> {
                   text: TextSpan(
                     text: widget.yayinlayan.kullaniciAdi + " ",
                     style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                        fontSize: 18.0,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
                     children: [
                       TextSpan(
                         text: widget.gonderi.aciklama,
                         style: TextStyle(
-                            fontSize: 18.0,
+                            fontSize: 14.0,
                             fontWeight: FontWeight.normal,
                             color: Colors.black),
                       ),

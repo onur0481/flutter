@@ -245,6 +245,19 @@ class FireStoreServisi {
     return gonderiler;
   }
 
+  Future<List<Gonderi>> akisFotoGetir(kullaniciId) async {
+    QuerySnapshot snapshot = await _firestore
+        .collection("gonderiAkislari")
+        .document(kullaniciId)
+        .collection("kullaniciAkisFotolari")
+        .orderBy("olusturulmaZamani", descending: true)
+        .getDocuments();
+
+    List<Gonderi> gonderiler =
+        snapshot.documents.map((doc) => Gonderi.dokumandanUret(doc)).toList();
+    return gonderiler;
+  }
+
   Future<void> resimGonderiSil(
       {String aktifKullaniciId, Gonderi gonderi}) async {
     _firestore
@@ -324,6 +337,21 @@ class FireStoreServisi {
 
     List<Yazi> yazilar =
         snapshot.documents.map((doc) => Yazi.dokumandanUret(doc)).toList();
+    return yazilar;
+  }
+
+  Future<List<Yazi>> akisYaziGetir(kullaniciId) async {
+    QuerySnapshot snapshot = await _firestore
+        .collection("akislar")
+        .document(kullaniciId)
+        .collection("kullaniciAkisGonderileri")
+        .orderBy("olusturulmaZamani", descending: true)
+        .getDocuments();
+
+    List<Yazi> yazilar =
+        snapshot.documents.map((doc) => Yazi.dokumandanUret(doc)).toList();
+
+    print("dejeke");
     return yazilar;
   }
 

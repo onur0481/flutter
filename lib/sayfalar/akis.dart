@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:socialapp/modeller/gonderi.dart';
+import 'package:socialapp/modeller/kullanici.dart';
+import 'package:socialapp/modeller/yazi.dart';
 import 'package:socialapp/sayfalar/resimyukle.dart';
+import 'package:socialapp/servisler/firestoreservisi.dart';
 import 'package:socialapp/servisler/yetkilendirmeservisi.dart';
 import 'package:socialapp/sayfalar/yaziyukle.dart';
+import 'package:socialapp/widgetlar/futureBuilder.dart';
+import 'package:socialapp/widgetlar/gonderiKarti.dart';
+import 'package:socialapp/widgetlar/yaziKarti.dart';
 
 class Akis extends StatefulWidget {
   @override
@@ -11,11 +18,43 @@ class Akis extends StatefulWidget {
 
 class _AkisState extends State<Akis> with SingleTickerProviderStateMixin {
   TabController takipkontrol;
+  List<Yazi> _yazilar = [];
+  List<Gonderi> _gonderiler = [];
+
+  _akisYazilariGetir() async {
+    String aktifKullaniciId =
+        Provider.of<YetkilendirmeServisi>(context, listen: false)
+            .aktifKullaniciId;
+    List<Yazi> yazilar =
+        await FireStoreServisi().akisYaziGetir(aktifKullaniciId);
+    if (mounted) {
+      setState(() {
+        _yazilar = yazilar;
+        print("deneme");
+      });
+    }
+  }
+
+  _akisGonderileriGetir() async {
+    String aktifKullaniciId =
+        Provider.of<YetkilendirmeServisi>(context, listen: false)
+            .aktifKullaniciId;
+    List<Gonderi> gonderiler =
+        await FireStoreServisi().akisFotoGetir(aktifKullaniciId);
+    if (mounted) {
+      setState(() {
+        _gonderiler = gonderiler;
+        print("dnee");
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     takipkontrol = TabController(length: 2, vsync: this);
+    _akisYazilariGetir();
+    _akisGonderileriGetir();
   }
 
   @override
@@ -30,6 +69,7 @@ class _AkisState extends State<Akis> with SingleTickerProviderStateMixin {
               fontSize: 40.0,
               color: Colors.blue),
         ),
+        centerTitle: true,
       ),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxScrolled) {
@@ -69,6 +109,27 @@ class _AkisState extends State<Akis> with SingleTickerProviderStateMixin {
   _medya() {
     return Stack(
       children: [
+        Container(
+          child: ListView.builder(
+            itemCount: _gonderiler.length,
+            itemBuilder: (context, index) {
+              Gonderi gonderi = _gonderiler[index];
+              return SilinmeyenFutureBuilder(
+                future: FireStoreServisi().kullaniciGetir(gonderi.yayinlayanId),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return SizedBox();
+                  }
+                  Kullanici gonderiSahibi = snapshot.data;
+                  return GonderiKarti(
+                    gonderi: gonderi,
+                    yayinlayan: gonderiSahibi,
+                  );
+                },
+              );
+            },
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: Row(
@@ -118,6 +179,32 @@ class _AkisState extends State<Akis> with SingleTickerProviderStateMixin {
             .aktifKullaniciId;
     return Stack(
       children: [
+        ListView(
+          children: [
+            ListView.builder(
+                shrinkWrap: true,
+                primary: false,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: _yazilar.length,
+                itemBuilder: (context, index) {
+                  Yazi yazi = _yazilar[index];
+                  return SilinmeyenFutureBuilder(
+                      future:
+                          FireStoreServisi().kullaniciGetir(yazi.yayinlayanId),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return SizedBox();
+                        }
+
+                        Kullanici yaziSahibi = snapshot.data;
+                        return YaziKarti(
+                          yazi: yazi,
+                          yayinlayan: yaziSahibi,
+                        );
+                      });
+                }),
+          ],
+        ),
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: Row(

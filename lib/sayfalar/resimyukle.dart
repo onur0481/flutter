@@ -160,106 +160,134 @@ class _YukleState extends State<Yukle> {
     return showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
-          return Column(
-            children: [
-              SizedBox(
-                height: 10.0,
+          return Stack(
+            children: <Widget>[
+              Container(
+                height: 30.0,
+                width: double.infinity,
+                color: Colors.black54,
               ),
               Container(
-                width: double.infinity,
-                height: 50.0,
                 decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                    color: Colors.black,
-                    width: 3.0,
-                  )),
-                ),
-                child: Center(
-                  child: Text(
-                    "Gönderi oluştur",
-                    style:
-                        TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25),
+                    )),
               ),
               Container(
-                width: double.infinity,
-                height: 50.0,
-                decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                    color: Colors.black,
-                    width: 2.0,
-                  )),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    fotoCek();
-                  },
-                  child: Center(
-                    child: Text(
-                      "Fotoğraf çek",
-                      style: TextStyle(fontSize: 20.0),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 5.0,
                     ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Container(
-                width: double.infinity,
-                height: 50.0,
-                decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                    color: Colors.black,
-                    width: 2.0,
-                  )),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    galeridenSec();
-                  },
-                  child: Center(
-                    child: Text(
-                      "Galeriden yükle",
-                      style: TextStyle(fontSize: 20.0),
+                    Container(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        "Seçenekler",
+                        style: TextStyle(fontSize: 25.0, color: Colors.blue),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Container(
-                width: double.infinity,
-                height: 50.0,
-                decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                    color: Colors.black,
-                    width: 2.0,
-                  )),
-                ),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Center(
-                    child: Text(
-                      "İptal",
-                      style: TextStyle(fontSize: 20.0),
+                    SizedBox(
+                      height: 5.0,
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 22.0, right: 22.0),
+                      child: Divider(
+                        color: Colors.black,
+                        height: 4.0,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15.0,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 22.0),
+                            child: Container(
+                              alignment: Alignment.topLeft,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.camera),
+                                  SizedBox(
+                                    width: 7.0,
+                                  ),
+                                  Text(
+                                    "Fotoğraf Çek",
+                                    style: TextStyle(fontSize: 17.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            fotoCek();
+                          },
+                        ),
+                        SizedBox(
+                          height: 15.0,
+                        ),
+                        InkWell(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 22.0),
+                            child: Container(
+                              alignment: Alignment.topLeft,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.photo_album_outlined),
+                                  SizedBox(
+                                    width: 7.0,
+                                  ),
+                                  Text(
+                                    "Galeriden Yükle",
+                                    style: TextStyle(fontSize: 17.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            galeridenSec();
+                          },
+                        ),
+                        SizedBox(
+                          height: 15.0,
+                        ),
+                        InkWell(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 22.0),
+                            child: Container(
+                              alignment: Alignment.topLeft,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.cancel_presentation,
+                                    color: Colors.red,
+                                  ),
+                                  SizedBox(
+                                    width: 7.0,
+                                  ),
+                                  Text(
+                                    "Vazgeç..",
+                                    style: TextStyle(
+                                        fontSize: 17.0, color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(
-                height: 10.0,
               ),
             ],
           );

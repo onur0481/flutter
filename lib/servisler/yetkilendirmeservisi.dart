@@ -32,6 +32,10 @@ class YetkilendirmeServisi {
     return _firebaseAuth.signOut();
   }
 
+  sifremiSifirla(String mail) async {
+    await _firebaseAuth.sendPasswordResetEmail(email: mail);
+  }
+
   Future<Kullanici> googleIleGiris() async {
     GoogleSignInAccount googleHesabi = await GoogleSignIn().signIn();
     GoogleSignInAuthentication googleYetkiKartim =

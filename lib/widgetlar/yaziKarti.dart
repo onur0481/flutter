@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:socialapp/modeller/kullanici.dart';
 import 'package:socialapp/modeller/yazi.dart';
+import 'package:socialapp/sayfalar/profil.dart';
 import 'package:socialapp/sayfalar/yaziYorumlari.dart';
 import 'package:socialapp/servisler/firestoreservisi.dart';
 import 'package:socialapp/servisler/yetkilendirmeservisi.dart';
@@ -245,16 +246,36 @@ class _YaziKartiState extends State<YaziKarti> {
     return ListTile(
       leading: Padding(
         padding: const EdgeInsets.only(left: 8.0),
-        child: CircleAvatar(
-          backgroundColor: Colors.blue,
-          backgroundImage: widget.yayinlayan.fotoUrl.isNotEmpty
-              ? NetworkImage(widget.yayinlayan.fotoUrl)
-              : AssetImage("assets/images/profil.png"),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Profil(
+                          profilSahibiId: widget.yazi.yayinlayanId,
+                        )));
+          },
+          child: CircleAvatar(
+            backgroundColor: Colors.blue,
+            backgroundImage: widget.yayinlayan.fotoUrl.isNotEmpty
+                ? NetworkImage(widget.yayinlayan.fotoUrl)
+                : AssetImage("assets/images/profil.png"),
+          ),
         ),
       ),
-      title: Text(
-        widget.yayinlayan.kullaniciAdi,
-        style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
+      title: GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Profil(
+                        profilSahibiId: widget.yazi.yayinlayanId,
+                      )));
+        },
+        child: Text(
+          widget.yayinlayan.kullaniciAdi,
+          style: TextStyle(fontSize: 17.0, fontWeight: FontWeight.bold),
+        ),
       ),
       trailing: IconButton(
           icon: Icon(
@@ -288,44 +309,68 @@ class _YaziKartiState extends State<YaziKarti> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            IconButton(
-              icon: !_begendinmi
-                  ? Icon(
-                      Icons.favorite_border,
-                      color: Colors.blue,
-                      size: 25.0,
-                    )
-                  : Icon(
-                      Icons.favorite,
-                      size: 25.0,
-                      color: Colors.red,
-                    ),
-              onPressed: _begeniDegistir,
-            ),
-            IconButton(
-                icon: Icon(
-                  Icons.comment_outlined,
-                  color: Colors.blue,
-                  size: 25.0,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              YaziYorumlari(yazi: widget.yazi)));
-                }),
-            IconButton(
-                icon: Icon(
-                  Icons.near_me_rounded,
-                  color: Colors.blue,
-                  size: 25.0,
-                ),
-                onPressed: () {})
-          ],
+        SizedBox(
+          height: 6.0,
+        ),
+        Container(
+          color: Colors.grey[200],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: !_begendinmi
+                        ? Icon(
+                            Icons.favorite_border,
+                            color: Colors.blue,
+                            size: 25.0,
+                          )
+                        : Icon(
+                            Icons.favorite,
+                            size: 25.0,
+                            color: Colors.red,
+                          ),
+                    onPressed: _begeniDegistir,
+                  ),
+                  Text("Beğen"),
+                ],
+              ),
+              Row(
+                children: [
+                  IconButton(
+                      icon: Icon(
+                        Icons.comment_outlined,
+                        color: Colors.blue,
+                        size: 25.0,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    YaziYorumlari(yazi: widget.yazi)));
+                      }),
+                  Text("Yorum yap"),
+                ],
+              ),
+              Row(
+                children: [
+                  IconButton(
+                      icon: Icon(
+                        Icons.near_me_rounded,
+                        color: Colors.blue,
+                        size: 25.0,
+                      ),
+                      onPressed: () {}),
+                  Text("Gönder"),
+                ],
+              )
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 9.0,
         ),
         Padding(
           padding: const EdgeInsets.only(left: 8.0),

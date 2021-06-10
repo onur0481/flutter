@@ -113,18 +113,18 @@ class _HesapOlusturState extends State<HesapOlustur> {
                     height: 50.0,
                   ),
                   Container(
+                    color: Theme.of(context).primaryColor,
                     width: double.infinity,
-                    child: FlatButton(
+                    child: TextButton(
                       onPressed: _kullaniciOlustur,
                       child: Text(
                         "Hesap Oluştur",
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                      color: Theme.of(context).primaryColor,
-                      textColor: Colors.white,
                     ),
                   ),
                 ],

@@ -119,10 +119,10 @@ class _ProfilDuzenleState extends State<ProfilDuzenle> {
           decoration: BoxDecoration(
             color: Colors.grey[400],
             image: DecorationImage(
-              image: _secilmisKapakFoto == null
-                  ? NetworkImage(widget.profil.kapakFotoUrl)
-                  : FileImage(_secilmisKapakFoto),
-            ),
+                image: _secilmisKapakFoto == null
+                    ? NetworkImage(widget.profil.kapakFotoUrl)
+                    : FileImage(_secilmisKapakFoto),
+                fit: BoxFit.cover),
           ),
         ),
         Positioned(
